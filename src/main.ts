@@ -1,4 +1,4 @@
-import { Actor, CollisionType, Color, Engine, Font, Text, vec } from "excalibur"
+import { Actor, CollisionType, Color, Engine, Font, FontUnit, Label, Loader, Sound, vec } from "excalibur"
 
 const game = new Engine({
     width: 800,
@@ -31,7 +31,7 @@ const bolinha = new Actor({
 
 bolinha.body.collisionType = CollisionType.Passive
 
-const velocidadeBolinha = vec(200, 200)
+const velocidadeBolinha = vec(450, 450)
 
 setTimeout(() => {
     bolinha.vel = velocidadeBolinha
@@ -89,22 +89,28 @@ listaBlocos.forEach(bloco => {
 })
 let pontos = 0
 
-const textoPontos = new Text({
-    text: "Points: " + pontos,
-    font: new Font ({size: 20})
+// const textoPontos = new Text({
+//     text: "Points: " + pontos,
+//     font: new Font ({size: 20})
 
+// })
+
+const textoPontos = new Label ({
+    text: pontos.toString(),
+    font: new Font({
+        size: 40,
+        color: Color.White,
+        strokeColor: Color.Black,
+        unit: FontUnit.Px
+    }),
+    pos: vec(50,300)
 })
 
-const objetoTexto = new Actor({
-    x: game.drawWidth - 80,
-    y: game.drawHeight - 15,
-    color: Color.White,
+const soundP = new Sound('./src/sounds/point.wav');
+const soundD = new Sound('./src/sounds/roblox-death.mp3')
+const loader = new Loader([soundP, soundD]);
 
-})
-
-objetoTexto.graphics.use(textoPontos)
-
-game.add(objetoTexto)
+game.add(textoPontos)
 
 let colidindo: boolean = false
 
@@ -112,6 +118,17 @@ bolinha.on("collisionstart", (event) => {
     if (listaBlocos.includes(event.other)) {
         event.other.kill()
         pontos++
+        soundP.play(0.5);
+        textoPontos.text = pontos.toString()
+        if (velocidadeBolinha.x < 2000 || velocidadeBolinha.y < 2000) {
+            velocidadeBolinha.x += 100
+            velocidadeBolinha.y += 100
+        }
+
+        if (pontos == 15) {
+            alert("Você Ganhou!")
+            window.location.reload()
+        }
     }
 
     let intersection = event.contact.mtv.normalize()
@@ -131,9 +148,10 @@ bolinha.on("collisionend", () => {
     colidindo = false
 })
 
-// bolinha.on("exitviewport", () =>{
-//     alert("Você perdeu!")
-//     window.location.reload()
-// })
+bolinha.on("exitviewport", async () =>{
+    await soundD.play(0.5)
+    alert("Você perdeu!")
+    window.location.reload()
+})
 
-game.start()
+await game.start(loader) 
