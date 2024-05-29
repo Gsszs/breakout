@@ -21,17 +21,17 @@ game.input.pointers.primary.on("move", (event) => {
     barra.pos.x = event.worldPos.x
 })
 
-
 const bolinha = new Actor({
     x: Math.floor(Math.random() * (700 - 100 + 100)) + 100,
-    y: 300,
+    y: 400,
     radius: 10,
     color: Color.Red
 })
 
+
 bolinha.body.collisionType = CollisionType.Passive
 
-const velocidadeBolinha = vec(450, 450)
+const velocidadeBolinha = vec(400, 400)
 
 setTimeout(() => {
     bolinha.vel = velocidadeBolinha
@@ -53,18 +53,18 @@ bolinha.on("postupdate", () => {
 
 game.add(bolinha)
 
-const padding = 20
+const padding = 25
 
 const xoffset = 65
 const yoffset = 20
 
-const linhas = 3
+const linhas = 8
 const colunas = 5
 
-const corBloco = [Color.Red, Color.Orange, Color.Yellow]
+const corBloco = [Color.Rose, Color.Magenta, Color.Cyan, Color.Blue, Color.Violet, Color.Red, Color.Orange, Color.Yellow]
 
 const larguraBloco = (game.drawWidth / colunas) - padding - (padding / colunas)
-const alturaBloco = 30
+const alturaBloco = 20
 
 const listaBlocos: Actor[] = []
 
@@ -88,12 +88,6 @@ listaBlocos.forEach(bloco => {
     game.add(bloco)
 })
 let pontos = 0
-
-// const textoPontos = new Text({
-//     text: "Points: " + pontos,
-//     font: new Font ({size: 20})
-
-// })
 
 const textoPontos = new Label ({
     text: pontos.toString(),
@@ -120,15 +114,16 @@ bolinha.on("collisionstart", (event) => {
         pontos++
         soundP.play(0.5);
         textoPontos.text = pontos.toString()
-        if (velocidadeBolinha.x < 2000 || velocidadeBolinha.y < 2000) {
+        if (velocidadeBolinha.x < 2100 || velocidadeBolinha.y < 2100) {
             velocidadeBolinha.x += 100
             velocidadeBolinha.y += 100
         }
 
-        if (pontos == 15) {
+        if (pontos == linhas * colunas) {
             alert("Você Ganhou!")
             window.location.reload()
         }
+        bolinha.color = event.other.color
     }
 
     let intersection = event.contact.mtv.normalize()
@@ -149,7 +144,7 @@ bolinha.on("collisionend", () => {
 })
 
 bolinha.on("exitviewport", async () =>{
-    await soundD.play(0.5)
+    await soundD.play(0)
     alert("Você perdeu!")
     window.location.reload()
 })
